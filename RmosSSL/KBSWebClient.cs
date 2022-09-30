@@ -8,7 +8,7 @@ namespace RmosSSL
 {
     public class KBSWebClient : WebClient
     {
-        private CookieContainer _cookieContainer = new CookieContainer();
+        public CookieContainer _cookieContainer = new CookieContainer();
 
         protected override WebRequest GetWebRequest(Uri address)
         {

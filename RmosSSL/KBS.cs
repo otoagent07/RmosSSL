@@ -41,7 +41,100 @@ namespace RmosSSL
             //kBSWebClient.DownloadFile("https://kbs.egm.gov.tr/RetCap.aspx", captcha_path);
         }
 
-        public void connect(string username, string password,string kod)
+
+        Api2 api = new Api2();
+
+        public void connect(string username, string password, string kod)
+        {
+            using (KBSWebClient kBSWebClient = new KBSWebClient())
+            {
+                // string input = kBSWebClient.DownloadString("http://kbs.egm.gov.tr/login.aspx");
+                ServicePointManager.Expect100Continue = true;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+                try
+                {
+                    api = new Api2();
+                    SessionModel session = api.getSession(kBSWebClient);
+
+                }
+                catch (Exception ex)
+                {
+
+                }
+
+                Console.WriteLine("kullanici : " + username + " şifre = " + password + " kod  = " + kod);
+
+
+                int sayac = 0;
+                string girdi = "Yeni oturum başlatmak için";
+                while (girdi.Contains("Yeni oturum başlatmak için"))
+                {
+                    NameValueCollection data = new NameValueCollection();
+                    data.Add("username", username);
+                    data.Add("tc", password);
+                    data.Add("password", kod);
+                    data.Add("vhost", "standard");
+
+
+                    Console.WriteLine("LÜTFEN BEKLEYİNİZ....");
+
+                    string deger2 = Encoding.UTF8.GetString(kBSWebClient.UploadValues("https://kbs.egm.gov.tr/my.policy", data));
+
+
+                    Console.WriteLine("SİSTEME GİRİLİYOR....");
+
+                    if (deger2.Contains("Tek Kullanımlık Parola"))
+                    {
+                        Console.WriteLine("Lütfen Güvenlik Kodunu Girdikten Sonra Entere Basınız.");
+                        string sonuc = Console.ReadLine();
+
+                        NameValueCollection data2 = new NameValueCollection();
+                        data2.Add("token", sonuc);
+                        data2.Add("vhost", "standard");
+
+
+                        girdi = Encoding.UTF8.GetString(kBSWebClient.UploadValues("https://kbs.egm.gov.tr/my.policy", data2));
+
+                        Console.WriteLine(sayac + " KERE DENENDİ ");
+
+                        if (girdi.Contains("Hatalı tek kullanımlık parola"))
+                        {
+                            sayac++;
+                            continue;
+                        }
+                        else
+                        {
+                           // girdi = kBSWebClient.DownloadString("https://kbs.egm.gov.tr/dana/home/launch.cgi?url=.ahuvsw%3A%2F%2Fsk2Kqt0Ow5BSBA");
+                        }
+                        if (sayac == 7)
+                        {
+                            Console.WriteLine("ÇOK DENEME OLDU LÜTFEN KAPATIP AÇIN");
+                            Thread.Sleep(10000);
+                            break;
+                        }
+                    }
+                    else if (deger2.Contains("Oturum açılamadı"))
+                    {
+                        api = new Api2();
+                        SessionModel session = api.getSession(kBSWebClient);
+                    }
+                    else if (deger2.Contains("Yeni oturum başlatmak için"))
+                    {
+                        api = new Api2();
+                        SessionModel session = api.getSession(kBSWebClient);
+                    }
+
+                }
+
+
+                this.client = kBSWebClient;
+            }
+        }
+
+
+        /*
+        public void connect(string username, string password, string kod)
         {
             using (KBSWebClient kBSWebClient = new KBSWebClient())
             {
@@ -58,7 +151,7 @@ namespace RmosSSL
 
                 }
 
-                Console.WriteLine("kullanici : "+username+" şifre = "+password +" kod  = "+kod);
+                Console.WriteLine("kullanici : " + username + " şifre = " + password + " kod  = " + kod);
 
 
                 int sayac = 0;
@@ -144,7 +237,7 @@ namespace RmosSSL
                         girdi = Encoding.UTF8.GetString(kBSWebClient.UploadValues("https://kbs.egm.gov.tr/dana-na/auth/url_CACp8c5rMVjMp7z4/login.cgi", data2));
 
 
-                   
+
 
                         Console.WriteLine(sayac + " KERE DENENDİ ");
 
@@ -199,11 +292,11 @@ namespace RmosSSL
             }
         }
 
-
+        */
         public List<Guest> guests()
         {
             List<Guest> list = new List<Guest>();
-            string input = this.client.UploadString("https://kbs.egm.gov.tr/ProjeDosya/,DanaInfo=.akcuCilsGox5K54,SSL+konaklayanekle.aspx", "value=asdasd");
+            string input = this.client.UploadString("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", "value=asdasd");
             string value = Regex.Matches(input, "id=\\\"__VIEWSTATE\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
             string value2 = Regex.Matches(input, "id=\\\"__VIEWSTATEGENERATOR\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
 
@@ -231,7 +324,7 @@ namespace RmosSSL
                     "Excel Aktar"
                 }
             };
-            string @string = Encoding.GetEncoding("iso-8859-9").GetString(this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/,DanaInfo=.akcuCilsGox5K54,SSL+konaklayanekle.aspx", data));
+            string @string = Encoding.GetEncoding("iso-8859-9").GetString(this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", data));
             MatchCollection matchCollection = Regex.Matches(@string, "<tr[^>]*>(.*?)</tr>", RegexOptions.Singleline);
             int num = 0;
             foreach (Match match in matchCollection)
@@ -299,7 +392,7 @@ namespace RmosSSL
 
         public void addTCGuest(string GuestTC, int GuestRoom, string GuestPlate = null, bool GuestDETAIL = false)
         {
-            string input = this.client.UploadString("https://kbs.egm.gov.tr/ProjeDosya/,DanaInfo=.akcuCilsGox5K54,SSL+konaklayanekle.aspx", "value=value");
+            string input = this.client.UploadString("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", "value=value");
             string value = Regex.Matches(input, "id=\\\"__VIEWSTATE\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
             string value2 = Regex.Matches(input, "id=\\\"__VIEWSTATEGENERATOR\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
 
@@ -343,7 +436,7 @@ namespace RmosSSL
                     GuestTC
                 }
             };
-            byte[] bytes = this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/,DanaInfo=.akcuCilsGox5K54,SSL+konaklayanekle.aspx", data);
+            byte[] bytes = this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", data);
             if (Regex.Match(Encoding.UTF8.GetString(bytes), "<input[^>]*name=\"txtAdi\"[^>]*value=\"([^\"]*)\"", RegexOptions.IgnoreCase | RegexOptions.Multiline).Success)
             {
                 string sad = Encoding.UTF8.GetString(bytes);
@@ -433,7 +526,7 @@ namespace RmosSSL
                             "Kaydet"
                         }
                     };
-                    this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/,DanaInfo=.akcuCilsGox5K54,SSL+konaklayanekle.aspx", data);
+                    this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", data);
                 }
                 else
                 {
@@ -508,7 +601,7 @@ namespace RmosSSL
                             "Kaydet"
                         }
                     };
-                    this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/,DanaInfo=.akcuCilsGox5K54,SSL+konaklayanekle.aspx", data);
+                    this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", data);
                 }
 
             }
@@ -516,7 +609,7 @@ namespace RmosSSL
 
         public void addForeignGuest(string GuestID, string GuestName, string GuestSurname, string GuestBirth, string GuestCountry, string GuestNation, int GuestRoom, string GuestPlate = null, string GuestFather = null, string GuestMother = null, string GuestGender = null, bool GuestDETAIL = false)
         {
-            string input = this.client.DownloadString("https://kbs.egm.gov.tr/ProjeDosya/,DanaInfo=.akcuCilsGox5K54,SSL+konaklayanekle.aspx");
+            string input = this.client.DownloadString("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx");
             string value = Regex.Matches(input, "id=\\\"__VIEWSTATE\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
             string value2 = Regex.Matches(input, "id=\\\"__VIEWSTATEGENERATOR\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
             string value3 = Regex.Matches(input, "<input[^>]*name=\"txtYGelisTarihi\"[^>]*value=\"([^\"]*)\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
@@ -603,7 +696,7 @@ namespace RmosSSL
                         AntiForgeryToken
                     }
                 };
-                this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/,DanaInfo=.akcuCilsGox5K54,SSL+konaklayanekle.aspx", data);
+                this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", data);
             }
             else
             {
@@ -682,7 +775,7 @@ namespace RmosSSL
                         "Kaydet"
                     }
                 };
-                this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/,DanaInfo=.akcuCilsGox5K54,SSL+konaklayanekle.aspx", data);
+                this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", data);
             }
         }
 
@@ -693,8 +786,8 @@ namespace RmosSSL
 
 
 
-                //string input = this.client.DownloadString("https://kbs.egm.gov.tr/ProjeDosya/,DanaInfo=.akcuCilsGox5K54,SSL+konaklayanekle.aspx");
-                string input = this.client.UploadString("https://kbs.egm.gov.tr/ProjeDosya/,DanaInfo=.akcuCilsGox5K54,SSL+konaklayanekle.aspx", "value=value");
+                //string input = this.client.DownloadString("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx");
+                string input = this.client.UploadString("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", "value=value");
 
                 string value = Regex.Matches(input, "id=\\\"__VIEWSTATE\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
                 string value2 = Regex.Matches(input, "id=\\\"__VIEWSTATEGENERATOR\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
@@ -742,7 +835,7 @@ namespace RmosSSL
             };
 
 
-                this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/,DanaInfo=.akcuCilsGox5K54,SSL+konaklayanekle.aspx", data);
+                this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", data);
 
             }
             catch (Exception ex)
@@ -761,7 +854,7 @@ namespace RmosSSL
 
         public KBSPerson TC_Sorgula(string GuestTC)
         {
-            string input = this.client.DownloadString("https://kbs.egm.gov.tr/ProjeDosya/,DanaInfo=.akcuCilsGox5K54,SSL+konaklayanekle.aspx");
+            string input = this.client.DownloadString("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx");
             string value = Regex.Matches(input, "id=\\\"__VIEWSTATE\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
             string value2 = Regex.Matches(input, "id=\\\"__VIEWSTATEGENERATOR\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
 
@@ -805,7 +898,7 @@ namespace RmosSSL
                     AntiForgeryToken
                 }
             };
-            byte[] bytes = this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/,DanaInfo=.akcuCilsGox5K54,SSL+konaklayanekle.aspx", data);
+            byte[] bytes = this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", data);
             if (Regex.Match(Encoding.UTF8.GetString(bytes), "<input[^>]*name=\"txtAdi\"[^>]*value=\"([^\"]*)\"", RegexOptions.IgnoreCase | RegexOptions.Multiline).Success)
             {
                 value = Regex.Matches(Encoding.UTF8.GetString(bytes), "id=\\\"__VIEWSTATE\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;

@@ -19,36 +19,13 @@ namespace RmosSSL
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-            /*
-             maritim
-             https://kbs.egm.gov.tr/login.aspx
-             resortnight.pib@maritim.com.tr
-             315580
-             */
 
-            /* args = new string[4];
-             args[0] = "info@butikpendikotel.com";// 
-             args[1] = "434528";// "434528"; 
-             args[2] = "keykubat";
-             args[3] = @"P_19790_30_04_2020.xml";
-            */
-
-
-            /* args = new string[4];
-                args[0] = "resortnight.pib@maritim.com.tr";// 
-                args[1] = "35845405970";// "434528"; 
-                args[2] = "keykubat";
-                args[3] = @"C:\cc\P_315580_11_06_2021.xml";
-                args[4] = @"C:\cc\P_315580_11_06_2021.xml";
-                //args[3] = @"P_19790_30_04_2020.xml";*/
-
-
-             //args = new string[5];
-             //    args[0] = "ik@sealifehotels.com";// 
-             //    args[1] = "18301197268";// "434528"; 
-             //    args[2] = "keykubat";
-             //    args[3] = @"C:\cc\P_14405_22_08_2021.xml";
-             //    args[4] = @"193602";
+            //args = new string[5];
+            //args[0] = "muhasebe@sealifehotels.com";// 
+            //args[1] = "13430589946";// "434528"; 
+            //args[2] = "keykubat";
+            //args[3] = @"C:\cc\P_193602_30_09_2022.xml";
+            //args[4] = @"207469";
 
 
             if (args.Length < 4)
