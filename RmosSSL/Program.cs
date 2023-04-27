@@ -9,7 +9,7 @@ using System.Xml;
 
 namespace RmosSSL
 {
-    class Program
+    public class Program
     {
         //static string RMOS_CONNSTR = "";
         static void Main(string[] args)
@@ -57,13 +57,26 @@ namespace RmosSSL
 
 
 
-            Yukle(KBS_username, KBS_password, KBS_Path,kod);
+            Yukle(KBS_username, KBS_password, KBS_Path, kod);
 
             Thread.Sleep(10000);
 
             //Console.ReadLine();
         }
-        private static void Yukle(string KBS_username, string KBS_password, string KBS_Path,string kod)
+
+        public static Dictionary<int, string> Main(List<Models.PersonelModel> pers)
+        {
+            Dictionary<int, string> sonuc = new Dictionary<int, string>();
+
+            foreach (var per in pers)
+            {
+                sonuc.Add(Array.IndexOf(pers.ToArray(), per), per.ad);
+            }
+
+            return sonuc;
+        }
+
+        private static void Yukle(string KBS_username, string KBS_password, string KBS_Path, string kod)
         {
             try
             {
@@ -477,7 +490,7 @@ namespace RmosSSL
                         Console.WriteLine("XML Toplam kayıt sayısı : " + num2);
                         Console.WriteLine("XML Hatalı kayıt sayısı : " + num);
                         Console.WriteLine("XML Gecerli kayıt sayısı : " + list.Count);
-                        KBS.connect(KBS_username, KBS_password,kod);
+                        KBS.connect(KBS_username, KBS_password, kod);
                         List<Guest> list3 = KBS.guests();
                         Console.WriteLine("KBS toplam kayıt sayısı : " + list3.Count);
                         using (List<Guest>.Enumerator enumerator2 = list.GetEnumerator())
