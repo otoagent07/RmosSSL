@@ -9,7 +9,7 @@ using System.Xml;
 
 namespace RmosSSL
 {
-    public class Program
+     class Program
     {
         //static string RMOS_CONNSTR = "";
         static void Main(string[] args)
@@ -64,6 +64,7 @@ namespace RmosSSL
             //Console.ReadLine();
         }
 
+        /*
         public static List<string> Main(List<Models.PersonelModel> pers, string KBS_username, string KBS_password, string kod, string telKod)
         {
 
@@ -368,7 +369,7 @@ namespace RmosSSL
 
             return sonuc;
         }
-
+        */
         private static void Yukle(string KBS_username, string KBS_password, string KBS_Path, string kod)
         {
             try
