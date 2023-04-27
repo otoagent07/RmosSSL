@@ -64,14 +64,307 @@ namespace RmosSSL
             //Console.ReadLine();
         }
 
-        public static Dictionary<int, string> Main(List<Models.PersonelModel> pers)
+        public static List<string> Main(List<Models.PersonelModel> pers, string KBS_username, string KBS_password, string kod, string telKod)
         {
-            Dictionary<int, string> sonuc = new Dictionary<int, string>();
 
-            foreach (var per in pers)
+            //args[0] = "muhasebe@sealifehotels.com";// 
+            //args[1] = "13430589946";// "434528"; 
+            //args[2] = "207469";
+            //args[3] = @"telkod";
+
+            List<string> sonuc = new List<string>();
+
+            try
             {
-                sonuc.Add(Array.IndexOf(pers.ToArray(), per), per.ad);
+                if (pers != null)
+                {
+                    #region nations
+                    string[] nations = new string[]
+                    {
+            "NONE",         //0
+            "TC",           //1
+            "KKTC",         //2
+            "AFG",          //3
+            "ALB",          //4
+            "DZA",          //5
+            "ASM",          //6
+            "AND",          //7
+            "AGO",          //8
+            "AIA",          //9
+            "ATA",          //10
+            "ATG",          //11
+            "ARG",          //12
+            "ARM",          //13
+            "ABW",          //14
+            "AUS",          //15
+            "AUT",          //16
+            "AZE",          //17
+            "BHS",          //18
+            "BHR",          //19
+            "BGD",          //20
+            "BRB",          //21
+            "BLR",          //22
+            "BEL",          //23
+            "BLZ",          //24
+            "BEN",          //25
+            "BMU",          //26
+            "BTN",          //27
+            "BOL",          //28
+            "BIH",          //29
+            "BWA",          //30
+            "BVT",          //31
+            "BRA",          //32
+            "IOT",          //33
+            "BRN",          //34
+            "BGR",          //35
+            "BFA",          //36
+            "BDI",          //37
+            "KHM",          //38
+            "CMR",          //39
+            "CAN",          //40
+            "CPV",          //41
+            "CYM",          //42
+            "CAF",          //43
+            "TCD",          //44
+            "CHL",          //45
+            "CHN",          //46
+            "CXR",          //47
+            "CCK",          //48
+            "COL",          //49
+            "COM",          //50
+            "COG",          //51
+            "COG",          //52
+            "COK",          //53
+            "CRI",          //54
+            "CIV",          //55
+            "HRV",          //56
+            "CUB",          //57
+            "CYP",          //58
+            "CZE",          //59
+            "DNK",          //60
+            "DJI",          //61
+            "DMA",          //62
+            "DOM",          //63
+            "ECU",          //64
+            "EGY",          //65
+            "SLV",          //66
+            "GNQ",          //67
+            "ERI",          //68
+            "EST",          //69
+            "ETH",          //70
+            "FRO",          //71
+            "FLK",          //72
+            "FJI",          //73
+            "FIN",          //74
+            "FRA",          //75
+            "GUF",          //76
+            "PYF",          //77
+            "ATF",          //78
+            "GAB",          //79
+            "GMB",          //80
+            "GEO",          //81
+            "DEU",          //82
+            "GHA",          //83
+            "GIB",          //84
+            "GRC",          //85
+            "GRL",          //86
+            "GRD",          //87
+            "GLP",          //88
+            "GUM",          //89
+            "GTM",          //90
+            "GBG",          //91
+            "GIN",          //92
+            "GNB",          //93
+            "GUY",          //94
+            "HTI",          //95
+            "HMD",          //96
+            "HND",          //97
+            "HKG",          //98
+            "HUN",          //99
+            "ISL",          //100
+            "IND",          //101
+            "IDN",          //102
+            "IRN",          //103
+            "IRQ",          //104
+            "IRL",          //105
+            "ISR",          //106
+            "ITA",          //107
+            "JAM",          //108
+            "JPN",          //109
+            "GBJ",          //110
+            "JOR",          //111
+            "KAZ",          //112
+            "KEN",          //113
+            "KIR",          //114
+            "PRK",          //115
+            "KOR",          //116
+            "KWT",          //117
+            "KGZ",          //118
+            "LAO",          //119
+            "LVA",          //120
+            "LBN",          //121
+            "LSO",          //122
+            "LBR",          //123
+            "LBY",          //124
+            "LIE",          //125
+            "LTU",          //126
+            "LUX",          //127
+            "MAC",          //128
+            "MKD",          //129
+            "MDG",          //130
+            "MWI",          //131
+            "MYS",          //132
+            "MDV",          //133
+            "MLI",          //134
+            "MLT",          //135
+            "MHL",          //136
+            "MTQ",          //137
+            "MRT",          //138
+            "MUS",          //139
+            "MYT",          //140
+            "MEX",          //141
+            "FSM",          //142
+            "MDA",          //143
+            "MCO",          //144
+            "MNG",          //145
+            "MSR",          //146
+            "MAR",          //147
+            "MOZ",          //148
+            "MMR",          //149
+            "NAM",          //150
+            "NRU",          //151
+            "NPL",          //152
+            "NLD",          //153
+            "ANT",          //154
+            "NCL",          //155
+            "NZL",          //156
+            "NIC",          //157
+            "NER",          //158
+            "NGA",          //159
+            "NIU",          //160
+            "NFK",          //161
+            "MNP",          //162
+            "NOR",          //163
+            "OMN",          //164
+            "PAK",          //165
+            "PLW",          //166
+            "PSE",          //167
+            "PAN",          //168
+            "PNG",          //169
+            "PRY",          //170
+            "PER",          //171
+            "PHL",          //172
+            "PCN",          //173
+            "POL",          //174
+            "PRT",          //175
+            "PRI",          //176
+            "QAT",          //177
+            "REU",          //178
+            "ROU",          //179
+            "RUS",          //180
+            "RWA",          //181
+            "SHN",          //182
+            "KNA",          //183
+            "LCA",          //184
+            "SPM",          //185
+            "VCT",          //186
+            "WSM",          //187
+            "SMR",          //188
+            "STP",          //189
+            "SAU",          //190
+            "SEN",          //191
+            "SRB",          //192
+            "SYC",          //193
+            "SLE",          //194
+            "SGP",          //195
+            "SVK",          //196
+            "SVN",          //197
+            "SLB",          //198
+            "SOM",          //199
+            "ZAF",          //200
+            "XXX",          //201   YOK
+            "SGS",          //202
+            "ESP",          //203
+            "LKA",          //204
+            "SDN",          //205
+            "SUR",          //206
+            "SJM",          //207
+            "SWZ",          //208
+            "SWE",          //209
+            "CHE",          //210
+            "SYR",          //211
+            "TWN",          //212
+            "TJK",          //213
+            "TZA",          //214
+            "THA",          //215
+            "TLS",          //216
+            "TGO",          //217
+            "TKL",          //218
+            "TON",          //219
+            "TTO",          //220
+            "TUN",          //221
+            "TKM",          //222
+            "TCA",          //223
+            "TUV",          //224
+            "UGA",          //225
+            "UKR",          //226
+            "ARE",          //227
+            "GBR",          //228
+            "USA",          //229
+            "UMI",          //230
+            "URY",          //231
+            "UZB",          //232
+            "VUT",          //233
+            "VAT",          //234
+            "VEN",          //235
+            "VEN",          //236
+            "VIR",          //237
+            "VIR",          //238
+            "WLF",          //239
+            "ESH",          //240
+            "YEM",          //241
+            "ZMB",          //242
+            "ZIM",          //243
+            "KOR"           //244
+                    };
+                    #endregion
+
+                    string[] genders = new string[]
+                    {
+                    "",
+                    "Erkek",
+                    "Kadın"
+                    };
+
+                    Thread.Sleep(500);
+                    KBS KBS = new KBS();
+                    List<Guest> list = new List<Guest>();
+                    List<int> list2 = new List<int>();
+
+                    for (int i = 0; i < pers.Count; i++)
+                    {
+                        try
+                        {
+
+                        }
+                        catch (Exception ex)
+                        {
+
+                            throw;
+                        }
+                        var personel = pers[i];
+
+
+                    }
+
+                }
             }
+            catch (Exception ex)
+            {
+                sonuc.Add("HATA# " + ex);
+                return sonuc;
+            }
+
 
             return sonuc;
         }
