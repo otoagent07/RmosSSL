@@ -70,31 +70,43 @@ namespace RmosSSL
                 string girdi = "Yeni oturum başlatmak için";
                 while (girdi.Contains("Yeni oturum başlatmak için"))
                 {
-                    NameValueCollection data = new NameValueCollection();
-                    data.Add("username", username);
-                    data.Add("tc", password);
-                    data.Add("password", kod);
-                    data.Add("vhost", "standard");
+                    string input = Encoding.UTF8.GetString(kBSWebClient.UploadValues("https://kbs.egm.gov.tr/login.aspx", new NameValueCollection()));
+
+                    string value = Regex.Matches(input, "id=\\\"__VIEWSTATE\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
+                    string value2 = Regex.Matches(input, "id=\\\"__VIEWSTATEGENERATOR\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
+
+
+
+                    NameValueCollection data = new NameValueCollection(); // password
+                    data.Add("txtkullaniciadi", username);
+                    data.Add("txtsifre", kod);
+                    data.Add("Button1", "Giriş");
+                    data.Add("GuidId", "");
+                    data.Add("__EVENTTARGET", "");
+                    data.Add("__EVENTARGUMENT", "");
+                    data.Add("__VIEWSTATE", value);
+                    data.Add("__VIEWSTATEGENERATOR", value2);
+                    data.Add("AntiForgeryToken", "");
 
 
                     Console.WriteLine("LÜTFEN BEKLEYİNİZ....");
 
-                    string deger2 = Encoding.UTF8.GetString(kBSWebClient.UploadValues("https://kbs.egm.gov.tr/my.policy", data));
+                    string deger2 = "";//Encoding.UTF8.GetString(kBSWebClient.UploadValues("https://kbs.egm.gov.tr/my.policy", data));
 
 
                     Console.WriteLine("SİSTEME GİRİLİYOR....");
 
-                    if (deger2.Contains("Tek Kullanımlık Parola"))
+                    if (1==1)
                     {
                         Console.WriteLine("Lütfen Güvenlik Kodunu Girdikten Sonra Entere Basınız.");
                         string sonuc = Console.ReadLine();
 
-                        NameValueCollection data2 = new NameValueCollection();
-                        data2.Add("token", sonuc);
-                        data2.Add("vhost", "standard");
+                        //NameValueCollection data2 = new NameValueCollection();
+                        data.Add("txtCaptcha", sonuc);
+                        //data2.Add("vhost", "standard");
 
 
-                        girdi = Encoding.UTF8.GetString(kBSWebClient.UploadValues("https://kbs.egm.gov.tr/my.policy", data2));
+                        girdi = Encoding.UTF8.GetString(kBSWebClient.UploadValues("https://kbs.egm.gov.tr/login.aspx", data));
 
                         Console.WriteLine(sayac + " KERE DENENDİ ");
 
