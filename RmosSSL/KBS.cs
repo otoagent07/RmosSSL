@@ -30,14 +30,14 @@ namespace RmosSSL
         }
 
 
-        string captcha_path = @"C:\u\sr\e-devlet\RetCap.aspx";
+        string captcha_path = @"C:\u\sr\e-devlet\RetCap.png";
         public void captchaIndir(string htmlAllText)
         {
             HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(htmlAllText);
             string val = doc.DocumentNode.SelectSingleNode("//*[@id=\"imgKod\"]").Attributes["src"].Value; // //*[@id="imgKod"]
             Base64ToImage(val).Save(captcha_path);
-
+            Process.Start(captcha_path);
             //kBSWebClient.DownloadFile("https://kbs.egm.gov.tr/RetCap.aspx", captcha_path);
         }
 
@@ -75,7 +75,7 @@ namespace RmosSSL
                     string value = Regex.Matches(input, "id=\\\"__VIEWSTATE\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
                     string value2 = Regex.Matches(input, "id=\\\"__VIEWSTATEGENERATOR\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
 
-
+                    captchaIndir(input);
 
                     NameValueCollection data = new NameValueCollection(); // password
                     data.Add("txtkullaniciadi", username);
@@ -108,7 +108,12 @@ namespace RmosSSL
 
                         girdi = Encoding.UTF8.GetString(kBSWebClient.UploadValues("https://kbs.egm.gov.tr/login.aspx", data));
 
-                        Console.WriteLine(sayac + " KERE DENENDİ ");
+                        string girisBararili = "Giriş Başarısız !!!";
+                        if (girdi.Contains("Hoşgeldiniz"))
+                        {
+                            girisBararili = "Giriş BAŞARILI";
+                        }
+                        Console.WriteLine(sayac + " KERE DENENDİ "+ girisBararili);
 
                         if (girdi.Contains("Hatalı tek kullanımlık parola"))
                         {
@@ -336,8 +341,112 @@ namespace RmosSSL
                     "Excel Aktar"
                 }
             };
-            string @string = Encoding.GetEncoding("iso-8859-9").GetString(this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", data));
-            MatchCollection matchCollection = Regex.Matches(@string, "<tr[^>]*>(.*?)</tr>", RegexOptions.Singleline);
+
+            //string @string = Encoding.GetEncoding("iso-8859-9").GetString(this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", data));
+            this.client.Encoding = System.Text.Encoding.GetEncoding("ISO-8859-9");
+            var datam = this.client.DownloadData("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx");
+            string text = Encoding.UTF8.GetString(datam);
+            HtmlAgilityPack.HtmlDocument doc2 = new HtmlAgilityPack.HtmlDocument();
+            doc2.LoadHtml(text);
+
+            var node = doc2.DocumentNode.SelectNodes("//*[@id=\"grdkonaklayan\"]");
+            if (node == null)
+            {
+                Console.WriteLine("misafir bilgisi alınamadı!!!");
+            }
+            else
+            {
+                bool ilkSatir = true;
+                foreach (var row1 in node)
+                {
+                    
+                    foreach (var row2 in row1.SelectNodes("./tr"))
+                    {
+                        if (ilkSatir)
+                        {
+                            ilkSatir = false;
+                            continue;
+                        }
+                        string varmi = row2.InnerText.Replace("\r\n", "").Trim();
+                        if (varmi == "") continue;
+                        string key = row2.SelectSingleNode("./td[2]/input").Attributes["value"].Value.Replace("\r\n", "").Trim();
+                        string tc = row2.SelectSingleNode("./td[2]").InnerText.Replace("\r\n", "").Trim();
+                        string pasaport = row2.SelectSingleNode("./td[3]").InnerText.Replace("\r\n", "").Trim();
+                        string ad = row2.SelectSingleNode("./td[4]").InnerText.Replace("\r\n", "").Trim();
+                        string soyad = row2.SelectSingleNode("./td[5]").InnerText.Replace("\r\n", "").Trim();
+                        string aracplaka = row2.SelectSingleNode("./td[6]").InnerText.Replace("\r\n", "").Trim();
+                        string giristar = row2.SelectSingleNode("./td[7]").InnerText.Replace("\r\n", "").Trim();
+                        string oda = row2.SelectSingleNode("./td[8]").InnerText.Replace("\r\n", "").Trim();
+                        string ulke= row2.SelectSingleNode("./td[9]").InnerText.Replace("\r\n", "").Trim();
+                        string cinsiyet= row2.SelectSingleNode("./td[10]").InnerText.Replace("\r\n", "").Trim();
+
+                        Guest guest = new Guest();
+                        guest.KEY = key;
+                        guest.ROOM = Convert.ToInt32(oda);
+                        guest.NAME = ad;
+                        guest.SURNAME = soyad;
+                        guest.COUNTRY = ulke;
+                        guest.CHECKIN = giristar;
+                        guest.PLATE = aracplaka;
+                        //guest.GENDER = matchCollection2[2].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                        if (tc!="")
+                        {
+                            guest.ID = tc;
+                            guest.setTC();
+                        }
+                        else
+                        {
+                            guest.ID = pasaport;
+                            guest.setForeign();
+                        }
+                        list.Add(guest);
+
+                    }
+                }
+            }
+        
+
+
+                return list;
+        }
+
+        public List<Guest> guestsEski() // 10.06.2023
+        {
+            List<Guest> list = new List<Guest>();
+            string input = this.client.UploadString("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", "value=asdasd");
+            string value = Regex.Matches(input, "id=\\\"__VIEWSTATE\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
+            string value2 = Regex.Matches(input, "id=\\\"__VIEWSTATEGENERATOR\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
+
+            HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+            doc.LoadHtml(input);
+            string AntiForgeryToken = doc.DocumentNode.SelectSingleNode("//*[@id=\"AntiForgeryToken\"]").Attributes["value"].Value;
+
+
+            NameValueCollection data = new NameValueCollection
+            {
+                {
+                    "__VIEWSTATE",
+                    value
+                },
+                {
+                    "__VIEWSTATEGENERATOR",
+                    value2
+                },
+                {
+                    "AntiForgeryToken",
+                    AntiForgeryToken
+                },
+                {
+                    "btnExcel",
+                    "Excel Aktar"
+                }
+            };
+
+            //string @string = Encoding.GetEncoding("iso-8859-9").GetString(this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", data));
+            this.client.Encoding = System.Text.Encoding.GetEncoding("ISO-8859-9");
+            var datam = this.client.DownloadData("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx");
+            string text = Encoding.UTF8.GetString(datam);
+            MatchCollection matchCollection = Regex.Matches(text, "<tr[^>]*>(.*?)</tr>", RegexOptions.Singleline);
             int num = 0;
             foreach (Match match in matchCollection)
             {

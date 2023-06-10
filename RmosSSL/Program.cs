@@ -33,7 +33,7 @@ namespace RmosSSL
             //args[0] = "muhasebe@sealifehotels.com";// 
             //args[1] = "13430589946";// "434528"; 
             //args[2] = "keykubat";
-            //args[3] = @"C:\cc\P_193602_09_06_2023.xml";
+            //args[3] = @"C:\dd\P_193602_09_06_2023.xml";
             //args[4] = @"207469";
 
             if (args.Length < 4)
