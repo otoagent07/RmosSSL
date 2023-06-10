@@ -41,6 +41,29 @@ namespace RmosSSL
             //kBSWebClient.DownloadFile("https://kbs.egm.gov.tr/RetCap.aspx", captcha_path);
         }
 
+        string txt;
+        int CfgObj, OcrObj, ImgObj;
+
+        public string captchaIndirVeCoz(string htmlAllText)
+        {
+            HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+            doc.LoadHtml(htmlAllText);
+            string val = doc.DocumentNode.SelectSingleNode("//*[@id=\"imgKod\"]").Attributes["src"].Value; // //*[@id="imgKod"]
+            Base64ToImage(val).Save(captcha_path);
+            string tamPath = captcha_path;
+            NSOCRLib.NSOCRClass NsOCR = new NSOCRLib.NSOCRClass();
+            NsOCR.Engine_SetLicenseKey("AB2A4DD5FF2A");
+            NsOCR.Engine_InitializeAdvanced(out CfgObj, out OcrObj, out ImgObj);
+            NsOCR.Img_LoadFile(ImgObj, tamPath);
+            NsOCR.Cfg_SetOption(CfgObj, TNSOCR.BT_DEFAULT, "Languages/Turkish", "1");
+            NsOCR.Cfg_SetOption(CfgObj, TNSOCR.BT_DEFAULT, "ImgAlizer/Inversion", "4");
+            NsOCR.Img_OCR(ImgObj, TNSOCR.OCRSTEP_FIRST, TNSOCR.OCRSTEP_LAST, TNSOCR.OCRFLAG_NONE);
+            NsOCR.Img_GetImgText(ImgObj, out txt, TNSOCR.FMT_EDITCOPY);
+            NsOCR.Engine_Uninitialize();
+            Console.WriteLine(txt);
+            return txt;
+        }
+
 
         Api2 api = new Api2();
 
@@ -75,7 +98,7 @@ namespace RmosSSL
                     string value = Regex.Matches(input, "id=\\\"__VIEWSTATE\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
                     string value2 = Regex.Matches(input, "id=\\\"__VIEWSTATEGENERATOR\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
 
-                    captchaIndir(input);
+                   string captcha= captchaIndirVeCoz(input);
 
                     NameValueCollection data = new NameValueCollection(); // password
                     data.Add("txtkullaniciadi", username);
@@ -98,11 +121,14 @@ namespace RmosSSL
 
                     if (1==1)
                     {
-                        Console.WriteLine("Lütfen Güvenlik Kodunu Girdikten Sonra Entere Basınız.");
-                        string sonuc = Console.ReadLine();
+                        //Console.WriteLine("Lütfen Güvenlik Kodunu Girdikten Sonra Entere Basınız.");
+                        //string sonuc = Console.ReadLine();
+
+                        Console.WriteLine("Güvenlik kod oto çözme sonuc : "+captcha);
+
 
                         //NameValueCollection data2 = new NameValueCollection();
-                        data.Add("txtCaptcha", sonuc);
+                        data.Add("txtCaptcha", captcha);
                         //data2.Add("vhost", "standard");
 
 
@@ -113,6 +139,7 @@ namespace RmosSSL
                         {
                             girisBararili = "Giriş BAŞARILI";
                         }
+                       
                         Console.WriteLine(sayac + " KERE DENENDİ "+ girisBararili);
 
                         if (girdi.Contains("Hatalı tek kullanımlık parola"))
