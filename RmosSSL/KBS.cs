@@ -72,7 +72,6 @@ namespace RmosSSL
         {
             using (KBSWebClient kBSWebClient = new KBSWebClient())
             {
-                // string input = kBSWebClient.DownloadString("http://kbs.egm.gov.tr/login.aspx");
                 ServicePointManager.Expect100Continue = true;
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
@@ -94,54 +93,34 @@ namespace RmosSSL
                 string girdi = "Yeni oturum başlatmak için";
                 while (girdi.Contains("Yeni oturum başlatmak için"))
                 {
-                    string input = Encoding.UTF8.GetString(kBSWebClient.UploadValues("https://kbs.egm.gov.tr/login.aspx", new NameValueCollection()));
-
-                    string value = Regex.Matches(input, "id=\\\"__VIEWSTATE\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
-                    string value2 = Regex.Matches(input, "id=\\\"__VIEWSTATEGENERATOR\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
-
-                   string captcha= captchaIndirVeCoz(input);
-
-                    NameValueCollection data = new NameValueCollection(); // password
-                    data.Add("txtkullaniciadi", username);
-                    data.Add("txtsifre", kod);
-                    data.Add("Button1", "Giriş");
-                    data.Add("GuidId", "");
-                    data.Add("__EVENTTARGET", "");
-                    data.Add("__EVENTARGUMENT", "");
-                    data.Add("__VIEWSTATE", value);
-                    data.Add("__VIEWSTATEGENERATOR", value2);
-                    data.Add("AntiForgeryToken", "");
+                    NameValueCollection data = new NameValueCollection();
+                    data.Add("username", username);
+                    data.Add("tc", password);
+                    data.Add("password", kod);
+                    data.Add("vhost", "standard");
 
 
                     Console.WriteLine("LÜTFEN BEKLEYİNİZ....");
 
-                    string deger2 = "";//Encoding.UTF8.GetString(kBSWebClient.UploadValues("https://kbs.egm.gov.tr/my.policy", data));
+                    string deger2 = Encoding.UTF8.GetString(kBSWebClient.UploadValues("https://kbs.egm.gov.tr/my.policy", data));
 
 
                     Console.WriteLine("SİSTEME GİRİLİYOR....");
 
-                    if (1==1)
+
+                    if (deger2.Contains("Tek Kullanımlık Parola"))
                     {
-                        //Console.WriteLine("Lütfen Güvenlik Kodunu Girdikten Sonra Entere Basınız.");
-                        //string sonuc = Console.ReadLine();
+                        Console.WriteLine("Lütfen Güvenlik Kodunu Girdikten Sonra Entere Basınız.");
+                        string sonuc = Console.ReadLine();
 
-                        Console.WriteLine("Güvenlik kod oto çözme sonuc : "+captcha);
-
-
-                        //NameValueCollection data2 = new NameValueCollection();
-                        data.Add("txtCaptcha", captcha);
-                        //data2.Add("vhost", "standard");
+                        NameValueCollection data2 = new NameValueCollection();
+                        data2.Add("token", sonuc);
+                        data2.Add("vhost", "standard");
 
 
-                        girdi = Encoding.UTF8.GetString(kBSWebClient.UploadValues("https://kbs.egm.gov.tr/login.aspx", data));
+                        girdi = Encoding.UTF8.GetString(kBSWebClient.UploadValues("https://kbs.egm.gov.tr/my.policy", data2));
 
-                        string girisBararili = "Giriş Başarısız !!!";
-                        if (girdi.Contains("Hoşgeldiniz"))
-                        {
-                            girisBararili = "Giriş BAŞARILI";
-                        }
-                       
-                        Console.WriteLine(sayac + " KERE DENENDİ "+ girisBararili);
+                        Console.WriteLine(sayac + " KERE DENENDİ ");
 
                         if (girdi.Contains("Hatalı tek kullanımlık parola"))
                         {
@@ -177,6 +156,116 @@ namespace RmosSSL
             }
         }
 
+        /*
+        public void connecteski(string username, string password, string kod) // 12.06.2023
+        {
+            using (KBSWebClient kBSWebClient = new KBSWebClient())
+            {
+                // string input = kBSWebClient.DownloadString("http://kbs.egm.gov.tr/login.aspx");
+                ServicePointManager.Expect100Continue = true;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+                try
+                {
+                    api = new Api2();
+                    SessionModel session = api.getSession(kBSWebClient);
+
+                }
+                catch (Exception ex)
+                {
+
+                }
+
+                Console.WriteLine("kullanici : " + username + " şifre = " + password + " kod  = " + kod);
+
+
+                int sayac = 0;
+                string girdi = "Yeni oturum başlatmak için";
+                while (girdi.Contains("Yeni oturum başlatmak için"))
+                {
+                    string input = Encoding.UTF8.GetString(kBSWebClient.UploadValues("https://kbs.egm.gov.tr/login.aspx", new NameValueCollection()));
+
+                    string value = Regex.Matches(input, "id=\\\"__VIEWSTATE\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
+                    string value2 = Regex.Matches(input, "id=\\\"__VIEWSTATEGENERATOR\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
+
+                    string captcha = captchaIndirVeCoz(input);
+
+                    NameValueCollection data = new NameValueCollection(); // password
+                    data.Add("txtkullaniciadi", username);
+                    data.Add("txtsifre", kod);
+                    data.Add("Button1", "Giriş");
+                    data.Add("GuidId", "");
+                    data.Add("__EVENTTARGET", "");
+                    data.Add("__EVENTARGUMENT", "");
+                    data.Add("__VIEWSTATE", value);
+                    data.Add("__VIEWSTATEGENERATOR", value2);
+                    data.Add("AntiForgeryToken", "");
+
+
+                    Console.WriteLine("LÜTFEN BEKLEYİNİZ....");
+
+                    string deger2 = "";//Encoding.UTF8.GetString(kBSWebClient.UploadValues("https://kbs.egm.gov.tr/my.policy", data));
+
+
+                    Console.WriteLine("SİSTEME GİRİLİYOR....");
+
+                    if (1 == 1)
+                    {
+                        //Console.WriteLine("Lütfen Güvenlik Kodunu Girdikten Sonra Entere Basınız.");
+                        //string sonuc = Console.ReadLine();
+
+                        Console.WriteLine("Güvenlik kod oto çözme sonuc : " + captcha);
+
+
+                        //NameValueCollection data2 = new NameValueCollection();
+                        data.Add("txtCaptcha", captcha);
+                        //data2.Add("vhost", "standard");
+
+
+                        girdi = Encoding.UTF8.GetString(kBSWebClient.UploadValues("https://kbs.egm.gov.tr/login.aspx", data));
+
+                        string girisBararili = "Giriş Başarısız !!!";
+                        if (girdi.Contains("Hoşgeldiniz"))
+                        {
+                            girisBararili = "Giriş BAŞARILI";
+                        }
+
+                        Console.WriteLine(sayac + " KERE DENENDİ " + girisBararili);
+
+                        if (girdi.Contains("Hatalı tek kullanımlık parola"))
+                        {
+                            sayac++;
+                            continue;
+                        }
+                        else
+                        {
+                            // girdi = kBSWebClient.DownloadString("https://kbs.egm.gov.tr/dana/home/launch.cgi?url=.ahuvsw%3A%2F%2Fsk2Kqt0Ow5BSBA");
+                        }
+                        if (sayac == 7)
+                        {
+                            Console.WriteLine("ÇOK DENEME OLDU LÜTFEN KAPATIP AÇIN");
+                            Thread.Sleep(10000);
+                            break;
+                        }
+                    }
+                    else if (deger2.Contains("Oturum açılamadı"))
+                    {
+                        api = new Api2();
+                        SessionModel session = api.getSession(kBSWebClient);
+                    }
+                    else if (deger2.Contains("Yeni oturum başlatmak için"))
+                    {
+                        api = new Api2();
+                        SessionModel session = api.getSession(kBSWebClient);
+                    }
+
+                }
+
+
+                this.client = kBSWebClient;
+            }
+        }
+        */
 
         /*
         public void connect(string username, string password, string kod)
@@ -338,7 +427,104 @@ namespace RmosSSL
         }
 
         */
-        public List<Guest> guests() // 12.06.2023
+
+        public List<Guest> guests()
+        {
+            List<Guest> list = new List<Guest>();
+            string input = this.client.UploadString("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", "value=asdasd");
+            string value = Regex.Matches(input, "id=\\\"__VIEWSTATE\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
+            string value2 = Regex.Matches(input, "id=\\\"__VIEWSTATEGENERATOR\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
+
+            HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+            doc.LoadHtml(input);
+            string AntiForgeryToken = doc.DocumentNode.SelectSingleNode("//*[@id=\"AntiForgeryToken\"]").Attributes["value"].Value;
+
+
+            NameValueCollection data = new NameValueCollection
+            {
+                {
+                    "__VIEWSTATE",
+                    value
+                },
+                {
+                    "__VIEWSTATEGENERATOR",
+                    value2
+                },
+                {
+                    "AntiForgeryToken",
+                    AntiForgeryToken
+                },
+                {
+                    "btnExcel",
+                    "Excel Aktar"
+                }
+            };
+            string @string = Encoding.GetEncoding("iso-8859-9").GetString(this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", data));
+            MatchCollection matchCollection = Regex.Matches(@string, "<tr[^>]*>(.*?)</tr>", RegexOptions.Singleline);
+            int num = 0;
+            foreach (Match match in matchCollection)
+            {
+                if (num == 0)
+                {
+                    num++;
+                }
+                else
+                {
+                    #region 12.12.2017 - Değiştirme Öncesi
+                    //    MatchCollection matchCollection2 = Regex.Matches(match.Value, "<td[^>]*>(.*?)</td>", RegexOptions.Singleline);
+                    //    bool flag = matchCollection2[5].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "").Length > 0;
+                    //    Guest guest = new Guest();
+                    //    guest.KEY = matchCollection2[4].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    //    guest.ROOM = KBS.GetNumbers(matchCollection2[8].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", ""));
+                    //    guest.NAME = matchCollection2[0].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    //    guest.SURNAME = matchCollection2[6].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    //    guest.COUNTRY = matchCollection2[7].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    //    guest.CHECKIN = matchCollection2[3].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    //    guest.PLATE = matchCollection2[1].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    //    if (flag)
+                    //    {
+                    //        guest.ID = matchCollection2[5].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    //        guest.setTC();
+                    //    }
+                    //    else
+                    //    {
+                    //        guest.ID = matchCollection2[2].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    //        guest.setForeign();
+                    //    }
+                    //    list.Add(guest);
+                    //    num++; 
+                    #endregion
+
+
+                    MatchCollection matchCollection2 = Regex.Matches(match.Value, "<td[^>]*>(.*?)</td>", RegexOptions.Singleline);
+                    bool flag = matchCollection2[6].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "").Length > 0;
+                    Guest guest = new Guest();
+                    guest.KEY = matchCollection2[5].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    guest.ROOM = KBS.GetNumbers(matchCollection2[9].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", ""));
+                    guest.NAME = matchCollection2[0].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    guest.SURNAME = matchCollection2[7].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    guest.COUNTRY = matchCollection2[8].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    guest.CHECKIN = matchCollection2[4].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    guest.PLATE = matchCollection2[1].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    //guest.GENDER = matchCollection2[2].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    if (flag)
+                    {
+                        guest.ID = matchCollection2[6].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                        guest.setTC();
+                    }
+                    else
+                    {
+                        guest.ID = matchCollection2[3].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                        guest.setForeign();
+                    }
+                    list.Add(guest);
+                    num++;
+
+                }
+            }
+            return list;
+        }
+        public List<Guest> guestsyeni() // 12.06.2023
         {
             List<Guest> list = new List<Guest>();
             string input = this.client.UploadString("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", "value=asdasd");
@@ -462,7 +648,7 @@ namespace RmosSSL
             }
         }
 
-        public List<Guest> guestseski() // 10.06.2023
+        public List<Guest> guestsyeni2() // 10.06.2023
         {
             List<Guest> list = new List<Guest>();
             string input = this.client.UploadString("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", "value=asdasd");
