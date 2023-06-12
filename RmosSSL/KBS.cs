@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -337,7 +338,7 @@ namespace RmosSSL
         }
 
         */
-        public List<Guest> guests()
+        public List<Guest> guests() // 12.06.2023
         {
             List<Guest> list = new List<Guest>();
             string input = this.client.UploadString("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", "value=asdasd");
@@ -346,40 +347,30 @@ namespace RmosSSL
 
             HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(input);
-            string AntiForgeryToken = doc.DocumentNode.SelectSingleNode("//*[@id=\"AntiForgeryToken\"]").Attributes["value"].Value;
+            //string AntiForgeryToken = doc.DocumentNode.SelectSingleNode("//*[@id=\"AntiForgeryToken\"]").Attributes["value"].Value;
 
 
-            NameValueCollection data = new NameValueCollection
-            {
-                {
-                    "__VIEWSTATE",
-                    value
-                },
-                {
-                    "__VIEWSTATEGENERATOR",
-                    value2
-                },
-                {
-                    "AntiForgeryToken",
-                    AntiForgeryToken
-                },
-                {
-                    "btnExcel",
-                    "Excel Aktar"
-                }
-            };
+            
 
-            //string @string = Encoding.GetEncoding("iso-8859-9").GetString(this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", data));
-            this.client.Encoding = System.Text.Encoding.GetEncoding("ISO-8859-9");
+            //this.client.Encoding = System.Text.Encoding.GetEncoding("ISO-8859-9");
             var datam = this.client.DownloadData("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx");
             string text = Encoding.UTF8.GetString(datam);
+
+
+            etiket:
+         
             HtmlAgilityPack.HtmlDocument doc2 = new HtmlAgilityPack.HtmlDocument();
             doc2.LoadHtml(text);
+
+            string AntiForgeryToken = doc2.DocumentNode.SelectSingleNode("//*[@id=\"AntiForgeryToken\"]").Attributes["value"].Value;
+             value = Regex.Matches(input, "id=\\\"__VIEWSTATE\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
+             value2 = Regex.Matches(input, "id=\\\"__VIEWSTATEGENERATOR\\\" value=\\\"(.*?)\\\"", RegexOptions.IgnoreCase | RegexOptions.Multiline)[0].Groups[1].Value;
 
             var node = doc2.DocumentNode.SelectNodes("//*[@id=\"grdkonaklayan\"]");
             if (node == null)
             {
                 Console.WriteLine("misafir bilgisi alınamadı!!!");
+                
             }
             else
             {
@@ -431,13 +422,47 @@ namespace RmosSSL
                     }
                 }
             }
-        
 
 
+            NameValueCollection data = new NameValueCollection
+            {
+                {
+                    "__VIEWSTATE",
+                    value
+                },
+                {
+                    "__VIEWSTATEGENERATOR",
+                    value2
+                },
+                {
+                    "AntiForgeryToken",
+                    AntiForgeryToken
+                },
+                {
+                    "__EVENTTARGET",
+                    "grdkonaklayan"
+                },
+                {
+                    "__EVENTARGUMENT",
+                    "Page$Next"
+                }
+            };
+
+            if (text.Contains("alt=\"Sonraki Sayfa\""))
+            {
+                //string jsontext = JsonConvert.SerializeObject(list);
+                Console.WriteLine(list.Count+" Veri çekildi...");
+                text = Encoding.GetEncoding("iso-8859-9").GetString(this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", data));
+                goto etiket;
+            }
+            else
+            {
                 return list;
+
+            }
         }
 
-        public List<Guest> guestsEski() // 10.06.2023
+        public List<Guest> guestseski() // 10.06.2023
         {
             List<Guest> list = new List<Guest>();
             string input = this.client.UploadString("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", "value=asdasd");
@@ -483,30 +508,30 @@ namespace RmosSSL
                 }
                 else
                 {
-                    #region 12.12.2017 - Değiştirme Öncesi
-                    //    MatchCollection matchCollection2 = Regex.Matches(match.Value, "<td[^>]*>(.*?)</td>", RegexOptions.Singleline);
-                    //    bool flag = matchCollection2[5].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "").Length > 0;
-                    //    Guest guest = new Guest();
-                    //    guest.KEY = matchCollection2[4].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
-                    //    guest.ROOM = KBS.GetNumbers(matchCollection2[8].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", ""));
-                    //    guest.NAME = matchCollection2[0].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
-                    //    guest.SURNAME = matchCollection2[6].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
-                    //    guest.COUNTRY = matchCollection2[7].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
-                    //    guest.CHECKIN = matchCollection2[3].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
-                    //    guest.PLATE = matchCollection2[1].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
-                    //    if (flag)
-                    //    {
-                    //        guest.ID = matchCollection2[5].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
-                    //        guest.setTC();
-                    //    }
-                    //    else
-                    //    {
-                    //        guest.ID = matchCollection2[2].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
-                    //        guest.setForeign();
-                    //    }
-                    //    list.Add(guest);
-                    //    num++; 
-                    #endregion
+                    //#region 12.12.2017 - Değiştirme Öncesi
+                    //MatchCollection matchCollection2 = Regex.Matches(match.Value, "<td[^>]*>(.*?)</td>", RegexOptions.Singleline);
+                    //bool flag = matchCollection2[5].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "").Length > 0;
+                    //Guest guest = new Guest();
+                    //guest.KEY = matchCollection2[4].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    //guest.ROOM = KBS.GetNumbers(matchCollection2[8].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", ""));
+                    //guest.NAME = matchCollection2[0].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    //guest.SURNAME = matchCollection2[6].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    //guest.COUNTRY = matchCollection2[7].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    //guest.CHECKIN = matchCollection2[3].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    //guest.PLATE = matchCollection2[1].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    //if (flag)
+                    //{
+                    //    guest.ID = matchCollection2[5].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    //    guest.setTC();
+                    //}
+                    //else
+                    //{
+                    //    guest.ID = matchCollection2[2].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                    //    guest.setForeign();
+                    //}
+                    //list.Add(guest);
+                    //num++;
+                    //#endregion
 
 
                     MatchCollection matchCollection2 = Regex.Matches(match.Value, "<td[^>]*>(.*?)</td>", RegexOptions.Singleline);

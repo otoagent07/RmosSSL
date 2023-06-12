@@ -36,6 +36,14 @@ namespace RmosSSL
             //args[3] = @"C:\dd\P_193602_09_06_2023.xml";
             //args[4] = @"207469";
 
+            // aşağıyı kapat
+            //args = new string[5];
+            //args[0] = "necmettin.basarslan@greenmaxhotel.com.tr";// 
+            //args[1] = "111";// "434528"; 
+            //args[2] = "keykubat";
+            //args[3] = @"C:\dd\P_28554_12_06_2023_grenmax.xml";
+            //args[4] = @"683600";
+
             if (args.Length < 4)
             {
                 Console.WriteLine("Hatalı Parametre");
