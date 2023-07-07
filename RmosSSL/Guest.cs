@@ -15,6 +15,7 @@ namespace RmosSSL
         public string KEY = null;
 
         public string ID = null;
+        public string IDyildizli = "";
 
         public string NAME = null;
 

@@ -12,6 +12,7 @@ namespace RmosSSL
     class Program
     {
         //static string RMOS_CONNSTR = "";
+        // https://kbs.egm.gov.tr/my.policy
         static void Main(string[] args)
         {
             //Yukle("", "", @"C:\444\P_19790_21_12_2017.xml");
@@ -43,6 +44,14 @@ namespace RmosSSL
             //args[2] = "keykubat";
             //args[3] = @"C:\dd\P_28554_12_06_2023_grenmax.xml";
             //args[4] = @"683600";
+
+            // aşağıyı kapat
+            //args = new string[5];
+            //args[0] = "sinancihangir@hotelsu.com.tr";// 
+            //args[1] = "29683029290";// "434528"; 
+            //args[2] = "keykubat";
+            //args[3] = @"C:\dd\P_0_07_07_2023_suotel.xml";
+            //args[4] = @"286244";
 
             if (args.Length < 4)
             {
@@ -717,6 +726,10 @@ namespace RmosSSL
                                                 }
                                                 else
                                                 {
+                                                    if (xmlNode2.Attributes["DogumTarihi"]==null)
+                                                    {
+                                                        throw new Exception("Hata oluştu");
+                                                    }
                                                     string text3 = Regex.Replace(xmlNode2.Attributes["DogumTarihi"].Value.ToString(), "\\s+", "");
                                                     if (text3.Length != 10)
                                                     {
@@ -830,12 +843,22 @@ namespace RmosSSL
                                 }
                             }
                         }
+
+                        foreach (var item in list)
+                        {
+                            item.IDyildizli = MaskString(item.ID);
+                        }
+                        foreach (var item in list3)
+                        {
+                            item.IDyildizli= MaskString(item.ID);
+                        }
+
                         using (List<Guest>.Enumerator enumerator2 = list3.GetEnumerator())
                         {
                             while (enumerator2.MoveNext())
                             {
                                 Guest guest = enumerator2.Current;
-                                Guest guest2 = list.Find((Guest item) => string.Equals(item.ID, guest.ID, StringComparison.OrdinalIgnoreCase) && string.Equals(item.ROOM.ToString(), guest.ROOM.ToString(), StringComparison.OrdinalIgnoreCase));
+                                Guest guest2 = list.Find((Guest item) => string.Equals(item.IDyildizli, guest.IDyildizli, StringComparison.OrdinalIgnoreCase) && string.Equals(item.ROOM.ToString(), guest.ROOM.ToString(), StringComparison.OrdinalIgnoreCase));
                                 if (guest2 == null)
                                 {
                                     KBS.checkout(guest.KEY);
@@ -849,7 +872,7 @@ namespace RmosSSL
                             while (enumerator2.MoveNext())
                             {
                                 Guest guest = enumerator2.Current;
-                                Guest guest2 = list3.Find((Guest item) => string.Equals(item.ID, guest.ID, StringComparison.OrdinalIgnoreCase) && string.Equals(item.ROOM.ToString(), guest.ROOM.ToString(), StringComparison.OrdinalIgnoreCase));
+                                Guest guest2 = list3.Find((Guest item) => string.Equals(item.IDyildizli, guest.IDyildizli, StringComparison.OrdinalIgnoreCase) && string.Equals(item.ROOM.ToString(), guest.ROOM.ToString(), StringComparison.OrdinalIgnoreCase));
                                 if (guest2 == null)
                                 {
                                     if (guest.isTC())
@@ -917,5 +940,21 @@ namespace RmosSSL
 
             }
         }
+
+       public static string MaskString(string input)
+        {
+            if (input.Length <= 5)
+            {
+                return input; // String 5 karakterden daha kısa ise değişiklik yapmadan geri döndürülür
+            }
+            else
+            {
+                string firstTwoChars = input.Substring(0, 2); // İlk iki karakter alınır
+                string lastThreeChars = input.Substring(input.Length - 3); // Son üç karakter alınır
+                string stars = new string('*', input.Length - 5); // Yıldız (*) karakterleri oluşturulur
+                return firstTwoChars + stars + lastThreeChars; // İlk iki karakter, yıldız karakterleri ve son üç karakter birleştirilerek döndürülür
+            }
+        }
+
     }
 }
