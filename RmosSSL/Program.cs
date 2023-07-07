@@ -810,18 +810,31 @@ namespace RmosSSL
                             }
                         }
 
+
+
                         Console.WriteLine("XML Toplam kayıt sayısı : " + num2);
                         Console.WriteLine("XML Hatalı kayıt sayısı : " + num);
                         Console.WriteLine("XML Gecerli kayıt sayısı : " + list.Count);
                         KBS.connect(KBS_username, KBS_password, kod);
                         List<Guest> list3 = KBS.guests();
                         Console.WriteLine("KBS toplam kayıt sayısı : " + list3.Count);
+
+                        foreach (var item in list)
+                        {
+                            item.IDyildizli = MaskString(item.ID);
+                        }
+                        foreach (var item in list3)
+                        {
+                            item.IDyildizli = MaskString(item.ID);
+                        }
+
+
                         using (List<Guest>.Enumerator enumerator2 = list.GetEnumerator())
                         {
                             while (enumerator2.MoveNext())
                             {
                                 Guest guest = enumerator2.Current;
-                                List<Guest> list4 = list3.FindAll((Guest item) => string.Equals(item.ID, guest.ID, StringComparison.OrdinalIgnoreCase) && string.Equals(item.ROOM.ToString(), guest.ROOM.ToString(), StringComparison.OrdinalIgnoreCase));
+                                List<Guest> list4 = list3.FindAll((Guest item) => string.Equals(item.IDyildizli, guest.IDyildizli, StringComparison.OrdinalIgnoreCase) && string.Equals(item.ROOM.ToString(), guest.ROOM.ToString(), StringComparison.OrdinalIgnoreCase));
                                 if (list4.Count > 1)
                                 {
                                     int num3 = 0;
@@ -834,7 +847,7 @@ namespace RmosSSL
                                         else
                                         {
                                             KBS.checkout(current.KEY);
-                                            Console.WriteLine(current.KEY + " silindi " + current.ROOM);
+                                            Console.WriteLine(current.KEY + " silindi(x) " + current.ROOM);
                                             //AutoClosingMessageBox.Show(current.KEY + " silindi " + current.ROOM, "", 100);
                                         }
                                     }
@@ -844,14 +857,6 @@ namespace RmosSSL
                             }
                         }
 
-                        foreach (var item in list)
-                        {
-                            item.IDyildizli = MaskString(item.ID);
-                        }
-                        foreach (var item in list3)
-                        {
-                            item.IDyildizli= MaskString(item.ID);
-                        }
 
                         using (List<Guest>.Enumerator enumerator2 = list3.GetEnumerator())
                         {
