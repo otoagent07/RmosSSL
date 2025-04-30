@@ -524,7 +524,7 @@ namespace RmosSSL
             }
             return list;
         } // 07.07.2023
-        public List<Guest> guests() // 12.06.2023
+        public List<Guest> guests() // 12.06.2023 30.04.2025
         {
             List<Guest> list = new List<Guest>();
             string input = this.client.UploadString("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", "value=asdasd");
