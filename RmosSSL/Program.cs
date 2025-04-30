@@ -15,43 +15,17 @@ namespace RmosSSL
         // https://kbs.egm.gov.tr/my.policy
         static void Main(string[] args)
         {
-            //Yukle("", "", @"C:\444\P_19790_21_12_2017.xml");
-            //Console.ReadLine();
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
             // aşağıyı kapat
             //args = new string[5];
-            //args[0] = "muhasebe@sealifehotels.com";// 
-            //args[1] = "13430589946";// "434528"; 
+            //args[0] = "ahmetgazi.buyukilikmen@greenmaxhotel.com.tr";// 
+            //args[1] = "35821203644";// "434528"; 
             //args[2] = "keykubat";
-            //args[3] = @"C:\cc\P_14405_24_10_2023.xml";
-            //args[4] = @"207469";
+            //args[3] = @"C:\cc\P_28554_30_04_2025.xml";
+            //args[4] = @"455416";
 
-
-            // aşağıyı kapat
-            //args = new string[5];
-            //args[0] = "muhasebe@sealifehotels.com";// 
-            //args[1] = "13430589946";// "434528"; 
-            //args[2] = "keykubat";
-            //args[3] = @"C:\dd\P_193602_09_06_2023.xml";
-            //args[4] = @"207469";
-
-            // aşağıyı kapat
-            //args = new string[5];
-            //args[0] = "necmettin.basarslan@greenmaxhotel.com.tr";// 
-            //args[1] = "52159542610";// "434528"; 
-            //args[2] = "keykubat";
-            //args[3] = @"C:\dd\P_28554_12_06_2023_grenmax.xml";
-            //args[4] = @"683600";
-
-            // aşağıyı kapat
-            //args = new string[5];
-            //args[0] = "sinancihangir@hotelsu.com.tr";// 
-            //args[1] = "29683029290";// "434528"; 
-            //args[2] = "keykubat";
-            //args[3] = @"C:\dd\P_0_07_07_2023_suotel.xml";
-            //args[4] = @"286244";
 
             if (args.Length < 4)
             {
@@ -679,7 +653,7 @@ namespace RmosSSL
                 List<int> list2 = new List<int>();
                 if (File.Exists(KBS_Path))
                 {
-                    Console.WriteLine("Aktarım Başladı...");
+                    Console.WriteLine("Versiyon v0.10 Aktarım Başladı...");
 
                     try
                     {
@@ -723,7 +697,7 @@ namespace RmosSSL
                                             num++;
                                             list2.Add(numbers);
 
-                                            odanolist.Add(odanoyaz(xmlNode2)+" odalı misafirin adi yok");
+                                            odanolist.Add(odanoyaz(xmlNode2) + " odalı misafirin adi yok");
 
                                         }
                                         else
@@ -749,7 +723,7 @@ namespace RmosSSL
                                                 }
                                                 else
                                                 {
-                                                    if (xmlNode2.Attributes["DogumTarihi"]==null)
+                                                    if (xmlNode2.Attributes["DogumTarihi"] == null)
                                                     {
                                                         throw new Exception("Hata oluştu");
                                                     }
@@ -842,7 +816,7 @@ namespace RmosSSL
                                     num++;
                                     list2.Add(numbers);
 
-                                    odanolist.Add(odanoyaz(xmlNode2) + " odalı misafir bilinmeyen hata\n"+ex.Message);
+                                    odanolist.Add(odanoyaz(xmlNode2) + " odalı misafir bilinmeyen hata\n" + ex.Message);
 
                                 }
                             }
@@ -867,7 +841,79 @@ namespace RmosSSL
                         List<Guest> list3 = KBS.guests();
                         Console.WriteLine("KBS toplam kayıt sayısı : " + list3.Count);
 
-                       
+
+                        if (list3.Count == 0)
+                        {
+                            Console.WriteLine("Polis sitesinde en az 1 kayıt olması lazımdır. tekrar deneyiniz...");
+                            Console.ReadLine();
+                            return;
+                        }
+
+
+                        // 30.04.2025 de eklenmiştir
+                        Console.WriteLine("##### BİZDE OLAN POLİS DE OLMAYAN #####");
+                        int sayac = 0;
+                        foreach (XmlNode xmlNode2 in xmlNode)
+                        {
+                            string adi = xmlNode2.Attributes["Adi"].Value;
+                            string soyadi = xmlNode2.Attributes["Soyadi"].Value;
+                            string KimlikSeriNo = xmlNode2.Attributes["TCKimlikNo"].Value;
+                            string odano = xmlNode2.Attributes["VerilenOdaNo"].Value;
+                            string kimlikno = string.IsNullOrEmpty(KimlikSeriNo) ? xmlNode2.Attributes["KimlikSeriNo"].Value : KimlikSeriNo;
+
+                            kimlikno = kimlikno.Replace(" ", "");
+                            if (kimlikno == "")
+                            {
+                                sayac++;
+                                Console.WriteLine($"tc veya pasaport no yok {adi} {soyadi} - {kimlikno} #  {odano}");
+                            }
+                            else
+                            {
+                                bool varMi = list3.Any(masked => Karsilastir(adi, masked.NAME));
+                                if (varMi)
+                                {
+                                    varMi = list3.Any(masked => Karsilastir(soyadi, masked.SURNAME));
+                                    if (varMi)
+                                    {
+                                        varMi = list3.Any(masked => KarsilastirID(kimlikno, masked.ID));
+                                    }
+                                }
+
+                                if (varMi == false)
+                                {
+                                    // olmayanlar
+                                    sayac++;
+                                    Console.WriteLine($"Eşleşmeyen: {adi} {soyadi} - {kimlikno} #  {odano}");
+
+                                    // tekrar göndermek
+                                    //Guest guest = list.Where(x => x.ID == kimlikno).FirstOrDefault();
+                                    //if (guest!=null)
+                                    //{
+                                    //    if (guest.isTC())
+                                    //    {
+                                    //        KBS.addTCGuest(guest.ID, guest.ROOM, guest.PLATE, guest.DETAIL);
+                                    //        Console.WriteLine(guest.ID + " (TC) eklendi " + guest.ROOM + " " + guest.NAME + " " + guest.SURNAME);
+                                    //        //AutoClosingMessageBox.Show(guest.ID + " (TC) eklendi " + guest.ROOM, "", 100);
+                                    //    }
+                                    //    else
+                                    //    {
+                                    //        KBS.addForeignGuest(guest.ID, guest.NAME, guest.SURNAME, guest.BIRTH, guest.COUNTRY, guest.NATION.ToString(), guest.ROOM, guest.PLATE, guest.FATHER, guest.MOTHER, guest.GENDER.ToString(), guest.DETAIL);
+                                    //        Console.WriteLine(guest.ID + " (Pasaport) eklendi " + guest.ROOM + " " + guest.NAME + " " + guest.SURNAME);
+                                    //        //AutoClosingMessageBox.Show(guest.ID + " (Pasaport) eklendi " + guest.ROOM, "", 100);
+                                    //    }
+                                    //}
+
+
+
+                                }
+
+                            }
+
+
+                        }
+                        Console.WriteLine($"##### BİZDE OLAN POLİS DE OLMAYAN KİŞİ SAYISI: {sayac} ####");
+                        Console.WriteLine("Enter basarak devam edin");
+                        Console.ReadLine();
 
                         foreach (var item in list)
                         {
@@ -945,6 +991,12 @@ namespace RmosSSL
                                 }
                             }
                         }
+
+
+                      
+                        //
+
+
                         Console.WriteLine(KBS_Path + " basarılı.");
 
                         //                        List<Guest> listSon = KBS.guests();
@@ -995,8 +1047,25 @@ namespace RmosSSL
 
             }
         }
+        public static bool Karsilastir(string original, string masked)
+        {
+            if (original.Length < 2 || masked.Length < 2)
+                return false;
 
-       public static string MaskString(string input)
+            return original[0] == masked[0] && original[1] == masked[1];
+        }
+        public static bool KarsilastirID(string original, string masked)
+        {
+            if (original.Length < 5 || masked.Length < 5)
+                return false;
+
+            bool basHarflerEslesiyor = original.Substring(0, 2) == masked.Substring(0, 2);
+            bool sonHarflerEslesiyor = original.Substring(original.Length - 3) == masked.Substring(masked.Length - 3);
+
+            return basHarflerEslesiyor && sonHarflerEslesiyor;
+        }
+
+        public static string MaskString(string input)
         {
             if (input.Length <= 5)
             {

@@ -524,6 +524,24 @@ namespace RmosSSL
             }
             return list;
         } // 07.07.2023
+
+
+
+
+        public string coz(string input)
+        {
+            try
+            {
+                byte[] latin1Bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(input);
+                return Encoding.UTF8.GetString(latin1Bytes);
+            }
+            catch (Exception ex)
+            {
+                return input;
+            }
+         
+        }
+
         public List<Guest> guests() // 12.06.2023 30.04.2025 11
         {
             List<Guest> list = new List<Guest>();
@@ -539,8 +557,11 @@ namespace RmosSSL
 
 
             //this.client.Encoding = System.Text.Encoding.GetEncoding("ISO-8859-9");
+            client.Encoding = Encoding.UTF8; // ← Burası çok önemli!
             var datam = this.client.DownloadData("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx");
-            string text = Encoding.UTF8.GetString(datam);
+            string text = Encoding.UTF8.GetString(datam); // BU DOĞRU
+
+           
 
 
         etiket:
@@ -587,8 +608,8 @@ namespace RmosSSL
                         Guest guest = new Guest();
                         guest.KEY = key;
                         guest.ROOM = Convert.ToInt32(oda);
-                        guest.NAME = ad;
-                        guest.SURNAME = soyad;
+                        guest.NAME = coz(ad);
+                        guest.SURNAME = coz(soyad);
                         guest.COUNTRY = ulke;
                         guest.CHECKIN = giristar;
                         guest.PLATE = aracplaka;
@@ -671,7 +692,7 @@ namespace RmosSSL
             }
             else
             {
-                Console.WriteLine("Polis Sitesindeki Toplam Misafir Sayısı : "+list.Count );
+                Console.WriteLine("Polis Sitesindeki Toplam Misafir Sayısı : " + list.Count);
 
 
                 return list;
@@ -680,7 +701,7 @@ namespace RmosSSL
         }
 
 
-    
+
 
 
         public List<Guest> guestsyeni2() // 10.06.2023
@@ -998,6 +1019,13 @@ namespace RmosSSL
                     this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", data);
                 }
 
+
+
+
+                // 30.04.2025 de aynı odada kalsınmı uyarısına evet dedik
+            
+
+
             }
         }
 
@@ -1171,7 +1199,103 @@ namespace RmosSSL
                 };
                 this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", data);
             }
+
+
+
+            // 30.04.2025 de aynı odada kalsınmı uyarısına evet dedik
+            //try
+            //{
+            //    NameValueCollection data = new NameValueCollection
+            //    {
+            //        {
+            //            "__EVENTTARGET",
+            //            "btnYabanciAyniOda"
+            //        },
+            //        {
+            //            "__EVENTARGUMENT",
+            //            "click"
+            //        },
+            //        {
+            //            "__VIEWSTATE",
+            //            value
+            //        },
+            //        {
+            //            "__VIEWSTATEGENERATOR",
+            //            value2
+            //        },
+            //        {
+            //            "__SCROLLPOSITIONX",
+            //            "0"
+            //        },
+            //        {
+            //            "__SCROLLPOSITIONY",
+            //            "185"
+            //        },
+            //        {
+            //            "txtPasaport",
+            //            GuestID
+            //        },
+            //        {
+            //            "txtYAdi",
+            //            GuestName
+            //        },
+            //        {
+            //            "txtYSoyadi",
+            //            GuestSurname
+            //        },
+            //        {
+            //            "txtYBabaadi",
+            //            GuestFather
+            //        },
+            //        {
+            //            "txtYAnaadi",
+            //            GuestMother
+            //        },
+            //        {
+            //            "txtYDogum",
+            //            GuestBirth
+            //        },
+            //        {
+            //            "txtYDogumYeri",
+            //            GuestCountry
+            //        },
+            //        {
+            //            "drpUyrugu",
+            //            GuestNation
+            //        },
+            //        {
+            //            "drp_listCinsiyet",
+            //            GuestGender
+            //        },
+            //        {
+            //            "txtYGelisTarihi",
+            //            value3
+            //        },
+            //        {
+            //            "txtYAracPlaka",
+            //            GuestPlate
+            //        },
+            //        {
+            //            "txtYVerilenOda",
+            //            GuestRoom.ToString()
+            //        },
+            //        {
+            //            "AntiForgeryToken",
+            //            AntiForgeryToken
+            //        }
+            //    };
+            //    this.client.UploadValues("https://kbs.egm.gov.tr/ProjeDosya/konaklayanekle.aspx", data);
+            //}
+            //catch (Exception ex)
+            //{
+
+            //}
+
+
+
         }
+
+      
 
         public void checkout(string KEY)
         {
