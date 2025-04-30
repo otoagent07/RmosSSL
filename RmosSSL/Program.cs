@@ -25,7 +25,7 @@ namespace RmosSSL
             //args[0] = "muhasebe@sealifehotels.com";// 
             //args[1] = "13430589946";// "434528"; 
             //args[2] = "keykubat";
-            //args[3] = @"C:\cc\P_193602_30_09_2022.xml";
+            //args[3] = @"C:\cc\P_14405_24_10_2023.xml";
             //args[4] = @"207469";
 
 
@@ -395,6 +395,22 @@ namespace RmosSSL
             return sonuc;
         }
         */
+
+
+        public static string odanoyaz(XmlNode node)
+        {
+            string odano = "";
+            try
+            {
+                return node.Attributes["VerilenOdaNo"].Value;
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return odano;
+        }
         private static void Yukle(string KBS_username, string KBS_password, string KBS_Path, string kod)
         {
             try
@@ -671,6 +687,7 @@ namespace RmosSSL
                         xmlDocument.Load(KBS_Path);
                         XmlNode xmlNode = xmlDocument.SelectSingleNode("Konaklama");
                         int num = 0;
+                        List<string> odanolist = new List<string>(); // 24.10.2023 eklendi log için
                         int num2 = 0;
                         if (xmlNode != null)
                         {
@@ -695,6 +712,7 @@ namespace RmosSSL
                                     {
                                         num++;
                                         list2.Add(numbers);
+                                        odanolist.Add("1 misafirin oda numarası yok");
                                     }
                                     else
                                     {
@@ -704,6 +722,9 @@ namespace RmosSSL
                                         {
                                             num++;
                                             list2.Add(numbers);
+
+                                            odanolist.Add(odanoyaz(xmlNode2)+" odalı misafirin adi yok");
+
                                         }
                                         else
                                         {
@@ -712,6 +733,8 @@ namespace RmosSSL
                                             {
                                                 num++;
                                                 list2.Add(numbers);
+                                                odanolist.Add(odanoyaz(xmlNode2) + " odalı misafirin soyadi yok");
+
                                             }
                                             else
                                             {
@@ -735,6 +758,9 @@ namespace RmosSSL
                                                     {
                                                         num++;
                                                         list2.Add(numbers);
+
+                                                        odanolist.Add(odanoyaz(xmlNode2) + " odalı misafirin DogumTarihi yok");
+
                                                         continue;
                                                     }
                                                     string text4 = Regex.Replace(xmlNode2.Attributes["KimlikSeriNo"].Value, "\\s+", "").ToString();
@@ -742,6 +768,9 @@ namespace RmosSSL
                                                     {
                                                         num++;
                                                         list2.Add(numbers);
+
+                                                        odanolist.Add(odanoyaz(xmlNode2) + " odalı misafirin KimlikSeriNo yok");
+
                                                         continue;
                                                     }
                                                     string text5 = Regex.Replace(xmlNode2.Attributes["Uyrugu"].Value, "\\s+", "").ToString();
@@ -749,12 +778,18 @@ namespace RmosSSL
                                                     {
                                                         num++;
                                                         list2.Add(numbers);
+
+                                                        odanolist.Add(odanoyaz(xmlNode2) + " odalı misafirin Uyrugu  yok");
+
                                                         continue;
                                                     }
                                                     if (Array.IndexOf<string>(nations, xmlNode2.Attributes["Uyrugu"].Value) <= 0 || Array.IndexOf<string>(nations, xmlNode2.Attributes["Uyrugu"].Value) == 1)
                                                     {
                                                         num++;
                                                         list2.Add(numbers);
+
+                                                        odanolist.Add(odanoyaz(xmlNode2) + " odalı misafirin Uyrugu yok");
+
                                                         continue;
                                                     }
                                                     string text6 = Regex.Replace(xmlNode2.Attributes["DogumYeri"].Value, "\\s+", "");
@@ -806,6 +841,9 @@ namespace RmosSSL
                                 {
                                     num++;
                                     list2.Add(numbers);
+
+                                    odanolist.Add(odanoyaz(xmlNode2) + " odalı misafir bilinmeyen hata\n"+ex.Message);
+
                                 }
                             }
                         }
@@ -815,9 +853,21 @@ namespace RmosSSL
                         Console.WriteLine("XML Toplam kayıt sayısı : " + num2);
                         Console.WriteLine("XML Hatalı kayıt sayısı : " + num);
                         Console.WriteLine("XML Gecerli kayıt sayısı : " + list.Count);
+
+                        Console.WriteLine("HATA DETAYLARI");
+                        foreach (var item in odanolist)
+                        {
+                            Console.WriteLine(item);
+                        }
+
+                        Console.WriteLine();
+                        Console.WriteLine();
+
                         KBS.connect(KBS_username, KBS_password, kod);
                         List<Guest> list3 = KBS.guests();
                         Console.WriteLine("KBS toplam kayıt sayısı : " + list3.Count);
+
+                       
 
                         foreach (var item in list)
                         {
