@@ -23,7 +23,7 @@ namespace RmosSSL
             //args[0] = "ahmetgazi.buyukilikmen@greenmaxhotel.com.tr";// 
             //args[1] = "35821203644";// "434528"; 
             //args[2] = "keykubat";
-            //args[3] = @"C:\cc\P_144217_17_07_2025.xml";
+            //args[3] = @"C:\cc\P_28554_30_04_2025.xml";
             //args[4] = @"455416";
 
 
