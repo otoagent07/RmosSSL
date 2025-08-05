@@ -570,27 +570,6 @@ namespace RmosSSL
                                     // olmayanlar
                                     sayac++;
                                     Console.WriteLine($"Eşleşmeyen: {adi} {soyadi} - {kimlikno} #  {odano}");
-
-                                    // tekrar göndermek
-                                    //Guest guest = list.Where(x => x.ID == kimlikno).FirstOrDefault();
-                                    //if (guest!=null)
-                                    //{
-                                    //    if (guest.isTC())
-                                    //    {
-                                    //        KBS.addTCGuest(guest.ID, guest.ROOM, guest.PLATE, guest.DETAIL);
-                                    //        Console.WriteLine(guest.ID + " (TC) eklendi " + guest.ROOM + " " + guest.NAME + " " + guest.SURNAME);
-                                    //        //AutoClosingMessageBox.Show(guest.ID + " (TC) eklendi " + guest.ROOM, "", 100);
-                                    //    }
-                                    //    else
-                                    //    {
-                                    //        KBS.addForeignGuest(guest.ID, guest.NAME, guest.SURNAME, guest.BIRTH, guest.COUNTRY, guest.NATION.ToString(), guest.ROOM, guest.PLATE, guest.FATHER, guest.MOTHER, guest.GENDER.ToString(), guest.DETAIL);
-                                    //        Console.WriteLine(guest.ID + " (Pasaport) eklendi " + guest.ROOM + " " + guest.NAME + " " + guest.SURNAME);
-                                    //        //AutoClosingMessageBox.Show(guest.ID + " (Pasaport) eklendi " + guest.ROOM, "", 100);
-                                    //    }
-                                    //}
-
-
-
                                 }
 
                             }
@@ -630,7 +609,6 @@ namespace RmosSSL
                                         {
                                             KBS.checkout(current.KEY);
                                             Console.WriteLine(current.KEY + " silindi(x) " + current.ROOM);
-                                            //AutoClosingMessageBox.Show(current.KEY + " silindi " + current.ROOM, "", 100);
                                         }
                                     }
 
