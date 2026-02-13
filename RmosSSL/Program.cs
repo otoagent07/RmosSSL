@@ -20,11 +20,11 @@ namespace RmosSSL
 
             // aşağıyı kapat
             //args = new string[5];
-            //args[0] = "ahmetgazi.buyukilikmen@greenmaxhotel.com.tr";// 
-            //args[1] = "35821203644";// "434528"; 
+            //args[0] = "ata.altundag@famehotels.com";// 
+            //args[1] = "37003836886";// "434528"; 
             //args[2] = "keykubat";
-            //args[3] = @"C:\cc\P_28554_30_04_2025.xml";
-            //args[4] = @"455416";
+            //args[3] = @"C:\cc\P_28564_13_02_2026.xml";
+            //args[4] = @"606492";
 
 
             if (args.Length < 4)
@@ -346,7 +346,7 @@ namespace RmosSSL
                 List<int> list2 = new List<int>();
                 if (File.Exists(KBS_Path))
                 {
-                    Console.WriteLine("Versiyon v0.10 Aktarım Başladı...");
+                    Console.WriteLine("Versiyon v0.15 Aktarım Başladı...");
 
                     try
                     {

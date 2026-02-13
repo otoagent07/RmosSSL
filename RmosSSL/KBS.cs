@@ -315,46 +315,59 @@ namespace RmosSSL
 
                     foreach (var row2 in row1.SelectNodes("./tr"))
                     {
-                        if (ilkSatir)
+                        string oda = "";
+                        try
                         {
-                            ilkSatir = false;
-                            continue;
-                        }
-                        string varmi = row2.InnerText.Replace("\r\n", "").Trim();
-                        if (varmi == "") continue;
-                        string key = row2.SelectSingleNode("./td[2]/input").Attributes["value"].Value.Replace("\r\n", "").Trim();
-                        string tc = row2.SelectSingleNode("./td[2]").InnerText.Replace("\r\n", "").Trim();
-                        string pasaport = row2.SelectSingleNode("./td[3]").InnerText.Replace("\r\n", "").Trim();
-                        string ad = row2.SelectSingleNode("./td[4]").InnerText.Replace("\r\n", "").Trim();
-                        string soyad = row2.SelectSingleNode("./td[5]").InnerText.Replace("\r\n", "").Trim();
-                        string aracplaka = row2.SelectSingleNode("./td[6]").InnerText.Replace("\r\n", "").Trim();
-                        string giristar = row2.SelectSingleNode("./td[7]").InnerText.Replace("\r\n", "").Trim();
-                        string oda = row2.SelectSingleNode("./td[8]").InnerText.Replace("\r\n", "").Trim();
-                        string ulke = row2.SelectSingleNode("./td[9]").InnerText.Replace("\r\n", "").Trim();
-                        string cinsiyet = row2.SelectSingleNode("./td[10]").InnerText.Replace("\r\n", "").Trim();
+                            if (ilkSatir)
+                            {
+                                ilkSatir = false;
+                                continue;
+                            }
+                            string varmi = row2.InnerText.Replace("\r\n", "").Trim();
+                            if (varmi == "") continue;
+                            string key = row2.SelectSingleNode("./td[2]/input").Attributes["value"].Value.Replace("\r\n", "").Trim();
+                            string tc = row2.SelectSingleNode("./td[2]").InnerText.Replace("\r\n", "").Trim();
+                            string pasaport = row2.SelectSingleNode("./td[3]").InnerText.Replace("\r\n", "").Trim();
+                            string ad = row2.SelectSingleNode("./td[4]").InnerText.Replace("\r\n", "").Trim();
+                            string soyad = row2.SelectSingleNode("./td[5]").InnerText.Replace("\r\n", "").Trim();
+                            string aracplaka = row2.SelectSingleNode("./td[6]").InnerText.Replace("\r\n", "").Trim();
+                            string giristar = row2.SelectSingleNode("./td[7]").InnerText.Replace("\r\n", "").Trim();
+                             oda = row2.SelectSingleNode("./td[8]").InnerText.Replace("\r\n", "").Trim();
 
-                        Guest guest = new Guest();
-                        guest.KEY = key;
-                        guest.ROOM = Convert.ToInt32(oda);
-                        guest.NAME = coz(ad);
-                        guest.SURNAME = coz(soyad);
-                        guest.COUNTRY = ulke;
-                        guest.CHECKIN = giristar;
-                        guest.PLATE = aracplaka;
-                        //guest.GENDER = matchCollection2[2].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
-                        if (tc != "")
+                            oda = Regex.Replace(oda, @"\D", "");
+
+
+                            string ulke = row2.SelectSingleNode("./td[9]").InnerText.Replace("\r\n", "").Trim();
+                            string cinsiyet = row2.SelectSingleNode("./td[10]").InnerText.Replace("\r\n", "").Trim();
+
+                            Guest guest = new Guest();
+                            guest.KEY = key;
+                            guest.ROOM = Convert.ToInt32(oda);
+                            guest.NAME = coz(ad);
+                            guest.SURNAME = coz(soyad);
+                            guest.COUNTRY = ulke;
+                            guest.CHECKIN = giristar;
+                            guest.PLATE = aracplaka;
+                            //guest.GENDER = matchCollection2[2].Groups[1].Value.Replace("nbsp;", "").Replace("&amp;", "").Replace("&", "");
+                            if (tc != "")
+                            {
+                                guest.ID = tc;
+                                guest.setTC();
+                            }
+                            else
+                            {
+                                guest.ID = pasaport;
+                                guest.setForeign();
+
+                            }
+                            list.Add(guest);
+
+                        }
+                        catch (Exception ex)
                         {
-                            guest.ID = tc;
-                            guest.setTC();
+                            Console.WriteLine($"bu odada sorun var : {oda}");
                         }
-                        else
-                        {
-                            guest.ID = pasaport;
-                            guest.setForeign();
-
-                        }
-                        list.Add(guest);
-
+                        
 
                     }
                 }
