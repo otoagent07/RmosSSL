@@ -11,7 +11,7 @@ namespace RmosSSL
 {
     class Program
     {
-        //static string RMOS_CONNSTR = "";
+        //static string RMOS_CONNSTR = ""; // aad
         // https://kbs.egm.gov.tr/my.policy
         static void Main(string[] args)
         {
