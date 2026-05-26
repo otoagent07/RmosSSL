@@ -39,6 +39,7 @@ namespace RmosSSL
             string RMOS_SIFRE = args[2];
             string KBS_Path = args[3];
             string kod = args[4];
+            string otoKod = args.Length > 5 ? args[5] : null;
 
 
 
@@ -56,7 +57,7 @@ namespace RmosSSL
 
 
 
-            Yukle(KBS_username, KBS_password, KBS_Path, kod);
+            Yukle(KBS_username, KBS_password, KBS_Path, kod, otoKod);
 
             Thread.Sleep(10000);
 
@@ -78,7 +79,7 @@ namespace RmosSSL
 
             return odano;
         }
-        private static void Yukle(string KBS_username, string KBS_password, string KBS_Path, string kod)
+        private static void Yukle(string KBS_username, string KBS_password, string KBS_Path, string kod, string otoKod = null)
         {
             try
             {
@@ -346,7 +347,7 @@ namespace RmosSSL
                 List<int> list2 = new List<int>();
                 if (File.Exists(KBS_Path))
                 {
-                    Console.WriteLine("Versiyon v0.15 Aktarım Başladı...");
+                    Console.WriteLine("Versiyon v0.16 Aktarım Başladı...");
 
                     try
                     {
@@ -523,7 +524,7 @@ namespace RmosSSL
                         Console.WriteLine();
                         Console.WriteLine();
 
-                        KBS.connect(KBS_username, KBS_password, kod);
+                        KBS.connect(KBS_username, KBS_password, kod, otoKod);
                         List<Guest> list3 = KBS.guests();
                         Console.WriteLine("KBS toplam kayıt sayısı : " + list3.Count);
 

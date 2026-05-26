@@ -68,7 +68,7 @@ namespace RmosSSL
 
         Api2 api = new Api2();
 
-        public void connect(string username, string password, string kod)
+        public void connect(string username, string password, string kod, string otoKod = null)
         {
             using (KBSWebClient kBSWebClient = new KBSWebClient())
             {
@@ -110,8 +110,16 @@ namespace RmosSSL
 
                     if (deger2.Contains("Tek Kullanımlık Parola"))
                     {
-                        Console.WriteLine("Lütfen Güvenlik Kodunu Girdikten Sonra Entere Basınız.");
-                        string sonuc = Console.ReadLine();
+                        string sonuc;
+                        if (!string.IsNullOrEmpty(otoKod))
+                        {
+                            sonuc = otoKod;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Lütfen Güvenlik Kodunu Girdikten Sonra Entere Basınız.");
+                            sonuc = Console.ReadLine();
+                        }
 
                         NameValueCollection data2 = new NameValueCollection();
                         data2.Add("token", sonuc);
